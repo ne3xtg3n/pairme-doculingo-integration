@@ -2048,3 +2048,732 @@ Ready to demo with real data (Willett Rye + Cantaloupe Haze as seed test).
 ---
 
 
+#Tayler Doculingo interaction package
+
+---
+
+📁 repo layout (copy this tree)
+
+pairme/
+├─ README.md
+├─ .env.example
+├─ config/
+│  └─ connectors.yml
+├─ backend/
+│  ├─ server.ts
+│  ├─ routes/
+│  │  ├─ scan.ts
+│  │  ├─ pair.ts
+│  │  ├─ find.ts
+│  │  └─ feedback.ts
+│  ├─ engine/
+│  │  ├─ scoring.ts
+│  │  └─ vibe.ts
+│  ├─ models/
+│  │  └─ schema.ts
+│  └─ services/
+│     └─ doculingo.ts
+├─ data/
+│  ├─ sample/
+│  │  ├─ whiskey_db.json
+│  │  ├─ food_db.json
+│  │  ├─ strain_db.json
+│  │  └─ vibe_db.json
+│  └─ parsed/
+│     └─ phase0.json
+├─ compliance/
+│  └─ scan_report_phase1.md
+├─ ops/
+│  ├─ analytics.md
+│  └─ reweight.ts
+├─ scripts/
+│  └─ migrate.sql
+└─ 09_Meeting/
+   ├─ Deliverables.md
+   └─ announcement.md
+
+
+---
+
+✅ README.md
+
+# PairMe × Doculingo — Integration Pack
+
+Scan a QR/barcode or search an item → get a Session with **Food · Drink · Smoke · Vibe** recommendations + **Find It Near Me** (pricing & stores).  
+Doculingo provides OCR, multilingual label parsing, and compliance risk scans.
+
+**Live Prototype:** https://lovable.dev/projects/e042fff4-6301-40a1-921a-b22f393b31d3  
+**Repo Guide:** This README + `/09_Meeting/Deliverables.md` = your to-do + how-to.
+
+## Stack
+- Frontend: React Native (Expo) + web (not included here)
+- Backend: Node.js/Express + PostgreSQL (Supabase) + Redis
+- Search/Vector: Elastic/Meilisearch + pgvector
+- AI: deterministic scoring (cosine) + vibe engine; optional LLM for creative copy
+- Partner APIs: Wine-Searcher, Weedmaps, Jane, Untappd, Open Food Facts
+- Doculingo: OCR/translation + risk scans
+
+## Dev Quickstart
+```bash
+cp .env.example .env   # fill keys
+pnpm i                 # or npm/yarn
+pnpm ts-node backend/server.ts
+# API at http://localhost:3000
+
+Key Endpoints
+
+POST /scan  → detect + parse label (Doculingo) → seed & vectors
+
+POST /pair  → score & return Food/Drink/Smoke/Vibe recs (with pricing summary if available)
+
+POST /find  → merchants: name, price, distance, stock, source
+
+POST /feedback → up/down to reweight models weekly
+
+
+Security & Safety
+
+Age 21+ modal & region gating (front end)
+
+“Don’t drive impaired” reminders
+
+Compliance scans via Doculingo (see /compliance)
+
+
+---
+
+# 🔐 .env.example
+```bash
+PORT=3000
+DATABASE_URL=postgres://user:pass@host:5432/pairme
+REDIS_URL=redis://localhost:6379
+
+# Partners
+WINESRCH_KEY=your_wine_searcher_key
+WEEDMAPS_KEY=your_weedmaps_key
+JANE_KEY=your_jane_key
+UNTAPPD_KEY=your_untappd_key
+OFF_KEY=unused_open_food_facts # OFF is open but keep placeholder
+
+# Doculingo
+DOCULINGO_API_URL=https://api.doculingo.example
+DOCULINGO_API_KEY=your_doculingo_key
+
+
+---
+
+⚙️ config/connectors.yml
+
+wine_searcher:
+  endpoints:
+    market_price: /api/marketprice
+  use: [spirits, wine, beer]
+
+weedmaps:
+  menu_api: true
+
+iheartjane:
+  menu_api: true
+
+untappd:
+  public_api: v4
+
+open_food_facts:
+  api: https://world.openfoodfacts.org/api/v2/product/{barcode}
+
+doculingo:
+  bridge_api: true
+  methods: [parseLabel, riskScan]
+
+
+---
+
+🧠 backend/models/schema.ts
+
+export interface SeedItem {
+  type: "strain"|"whiskey"|"food"|"playlist";
+  id?: string;
+  name: string;
+  meta?: Record<string, any>;
+}
+
+export interface Vectors {
+  terpenes?: Record<string, number>;
+  flavor_tags?: string[];
+  intensity?: number; // 0..1
+}
+
+export interface RecItem {
+  id: string;
+  name: string;
+  type: string;   // "drink"|"food"|"smoke"
+  score: number;  // 0..1
+  why: string;
+  profile?: Record<string, any>;
+  mode?: "neat"|"big_ice"|"highball"|"stirred";
+  pricing?: { min_price?: number; store_count?: number }; // summary from /find
+}
+
+export interface VibeItem {
+  category: "music"|"lighting"|"environment"|"scent"|"activity";
+  name: string;
+  details: string;
+  score?: number; // 0..1
+  links?: { service?: string; url?: string }[];
+}
+
+export interface SessionOut {
+  session_id: string;
+  seed_item: SeedItem;
+  profile?: {
+    mood?: "chill"|"creative"|"social"|"sleep";
+    intensity_target?: number; // 0..1
+    preferences?: {sweet?:number; spice?:number; fruit?:number; smoke?:number};
+  };
+  vectors: Vectors;
+  recommendations: {
+    food: RecItem[];
+    drink: RecItem[];
+    smoke: RecItem[];
+    vibe: VibeItem[];
+  };
+}
+
+
+---
+
+🧠 backend/engine/scoring.ts
+
+type Vec = Record<string, number>;
+
+const dot = (a: Vec, b: Vec) => Object.keys(a).reduce((s,k)=> s + (a[k]||0)*(b[k]||0), 0);
+const mag = (a: Vec) => Math.sqrt(dot(a,a));
+const cosine = (a: Vec, b: Vec) => { const m = mag(a)*mag(b); return m===0?0:dot(a,b)/m; };
+
+export interface PairInput {
+  terpenes: Vec;
+  intensity: number; // 0..1
+  mood?: "chill"|"creative"|"social"|"sleep";
+  prefs?: {sweet?:number; spice?:number; fruit?:number; smoke?:number};
+}
+
+export interface Candidate {
+  id: string;
+  vector: Vec; // normalized flavor axes
+  abv?: number;
+  availability?: "common"|"uncommon"|"grail";
+  smoke?: number;
+}
+
+export function scoreCandidate(seed: PairInput, c: Candidate): number {
+  const terpToFlavor: Vec = {
+    sweet: (seed.terpenes.limonene||0)*0.2 + (seed.terpenes.linalool||0)*0.2,
+    fruit_orchard: (seed.terpenes.limonene||0)*0.3,
+    fruit_tropical: (seed.terpenes.myrcene||0)*0.2,
+    spice: (seed.terpenes.caryophyllene||0)*0.4,
+    oak: (seed.terpenes.myrcene||0)*0.2,
+    smoke: 0
+  };
+
+  const sim = cosine(terpToFlavor, c.vector);
+  const complement = (c.vector.spice||0)*0.3 + (c.vector.oak||0)*0.2;
+  const smokeClash = (c.vector.smoke||0)*0.6;
+  const abvMatch = c.abv ? 1 - Math.abs((c.abv/60) - seed.intensity) : 0.75;
+
+  const moodBoost =
+    seed.mood === "chill" ? (1-(c.vector.spice||0))*0.2 :
+    seed.mood === "creative" ? ((c.vector.fruit_tropical||0)+(c.vector.fruit_orchard||0))*0.1 :
+    seed.mood === "social" ? (c.vector.sweet||0)*0.1 : 0;
+
+  const availability =
+    c.availability === "common" ? 0.05 :
+    c.availability === "uncommon" ? 0.02 : 0;
+
+  const base = 0.35*sim + 0.25*complement - 0.15*smokeClash + 0.15*abvMatch + 0.10*moodBoost + availability;
+
+  const p = seed.prefs || {};
+  const prefAdj = (p.sweet||0)*(c.vector.sweet||0)*0.05
+                + (p.spice||0)*(c.vector.spice||0)*0.05
+                + (p.fruit||0)*((c.vector.fruit_orchard||0)+(c.vector.fruit_tropical||0))*0.05
+                - (p.smoke||0)*(c.vector.smoke||0)*0.05;
+
+  return Math.max(0, Math.min(1, base + prefAdj));
+}
+
+
+---
+
+🎛️ backend/engine/vibe.ts
+
+import { VibeItem } from "../models/schema";
+
+export function buildVibe(seed: { mood: "chill"|"creative"|"social"; intensity: number }): VibeItem[] {
+  const music =
+    seed.mood === "chill"
+      ? {category:"music", name:"Vaporwave Sunset", details:"90–105 BPM, warm synth, low dynamics", score:0.90}
+      : seed.mood === "creative"
+      ? {category:"music", name:"Lo-fi Studio", details:"88–96 BPM, lo-fi hip hop, minimal vocals", score:0.88}
+      : {category:"music", name:"Soul & Classic Funk", details:"100–112 BPM, live horns, high groove", score:0.90};
+
+  const lighting =
+    seed.mood === "social"
+      ? {category:"lighting", name:"Amber Glow + Accent", details:"2700K warm 40% + magenta accent", score:0.86}
+      : {category:"lighting", name:"Warm Amber", details:"2700K at 35–40%, indirect bounce", score:0.84};
+
+  const environment =
+    seed.mood === "chill"
+      ? {category:"environment", name:"Rooftop / Patio", details:"Low wind, seated conversation", score:0.82}
+      : {category:"environment", name:"Lounge Nook", details:"Low seating, soft textiles", score:0.80};
+
+  const scent = {category:"scent", name:"Cedar & Bergamot", details:"Woody + citrus aligns with oak/limonene", score:0.85};
+  const activity =
+    seed.mood === "creative"
+      ? {category:"activity", name:"Notebook + Sketch", details:"Capture ideas between sips", score:0.77}
+      : {category:"activity", name:"Vinyl Session", details:"Side A/B ritual, mindful sipping", score:0.75};
+
+  return [music, lighting, environment, scent, activity];
+}
+
+
+---
+
+🔗 backend/services/doculingo.ts (stub wired & documented)
+
+import axios from "axios";
+
+type ParseInput = { imageUrl?: string; pdfUrl?: string; rawText?: string; localeHint?: string };
+type ParseOutput = {
+  ocr: string;
+  translation?: { from: string; to: string; text: string };
+  normalized: {
+    brand?: string; product?: string; abv?: number; size_ml?: number; region?: string;
+    notes_raw?: string[];
+    vector: Record<string, number>; // sweet, spice, fruit_orchard, fruit_tropical, oak, smoke, citrus, herbal
+  };
+};
+
+type RiskFinding = { clause: string; severity: "low"|"med"|"high"; note: string };
+type RiskOutput = { status: "GREEN"|"AMBER"|"RED"; findings: RiskFinding[] };
+
+const baseURL = process.env.DOCULINGO_API_URL!;
+const key = process.env.DOCULINGO_API_KEY!;
+
+/** parse a label or document via Doculingo Bridge */
+export async function parseLabel(input: ParseInput): Promise<ParseOutput> {
+  if (!baseURL || !key) throw new Error("Doculingo env not set");
+
+  // Replace this with real Doculingo API call when available:
+  // const { data } = await axios.post(`${baseURL}/parseLabel`, input, { headers: { Authorization: `Bearer ${key}` }});
+  // return data;
+
+  // ---- MOCK RESPONSE (safe to develop with) ----
+  return {
+    ocr: input.rawText || "Willett Family Estate Bottled 4 Year Rye, 56.2% ABV",
+    translation: undefined,
+    normalized: {
+      brand: "Willett", product: "Family Estate Bottled 4 Year Rye", abv: 56.2, size_ml: 750, region: "Kentucky",
+      notes_raw: ["cinnamon","clove","vanilla","oak","herbal rye"],
+      vector: { sweet:0.30, spice:0.70, oak:0.50, smoke:0.00, fruit_orchard:0.10, fruit_tropical:0.05, citrus:0.05, herbal:0.40 }
+    }
+  };
+}
+
+/** run a compliance risk scan on ToS or partner docs */
+export async function riskScan(docText: string): Promise<RiskOutput> {
+  if (!baseURL || !key) throw new Error("Doculingo env not set");
+
+  // const { data } = await axios.post(`${baseURL}/riskScan`, { text: docText }, { headers: { Authorization: `Bearer ${key}` }});
+  // return data;
+
+  // ---- MOCK RESPONSE ----
+  return {
+    status: "AMBER",
+    findings: [
+      { clause: "Alcohol shipping across state lines", severity: "high", note: "Requires 3-tier compliant partner" },
+      { clause: "Cannabis promotional restrictions", severity: "med", note: "Age gating & regional filters needed" }
+    ]
+  };
+}
+
+
+---
+
+🌐 backend/routes/scan.ts
+
+import { Router } from "express";
+import { parseLabel } from "../services/doculingo";
+import { SessionOut, SeedItem, Vectors } from "../models/schema";
+import { buildVibe } from "../engine/vibe";
+
+const router = Router();
+
+router.post("/", async (req, res) => {
+  try {
+    const { qr, barcode, text, mood = "chill", intensity = 0.6 } = req.body || {};
+    const parsed = await parseLabel({ rawText: text || qr || barcode });
+
+    const seed: SeedItem = { type: "whiskey", name: parsed.normalized.product || "Detected Item", meta: parsed.normalized };
+    const vectors: Vectors = {
+      flavor_tags: parsed.normalized.notes_raw || [],
+      intensity,
+      terpenes: {} // if strain: fill from parsed
+    };
+
+    const session: SessionOut = {
+      session_id: crypto.randomUUID(),
+      seed_item: seed,
+      profile: { mood, intensity_target: intensity },
+      vectors,
+      recommendations: { food: [], drink: [], smoke: [], vibe: buildVibe({ mood, intensity }) }
+    };
+
+    res.json(session);
+  } catch (e:any) {
+    res.status(500).json({ error: e.message || "scan failed" });
+  }
+});
+
+export default router;
+
+
+---
+
+🧮 backend/routes/pair.ts
+
+import { Router } from "express";
+import { scoreCandidate } from "../engine/scoring";
+import { SessionOut, RecItem, VibeItem } from "../models/schema";
+import sampleWhiskey from "../../data/sample/whiskey_db.json";
+import sampleFood from "../../data/sample/food_db.json";
+import sampleStrain from "../../data/sample/strain_db.json";
+import sampleVibe from "../../data/sample/vibe_db.json";
+
+const router = Router();
+
+router.post("/", async (req, res) => {
+  try {
+    const { seed_item, vectors, profile } = req.body as SessionOut;
+    const pairInput = {
+      terpenes: vectors.terpenes || {},
+      intensity: vectors.intensity ?? 0.6,
+      mood: profile?.mood || "chill",
+      prefs: profile?.preferences
+    };
+
+    // score DRINK
+    const drink: RecItem[] = (sampleWhiskey as any[]).map(w => ({
+      id: w.id,
+      name: w.id.replace(/_/g," "),
+      type: "drink",
+      score: Number(scoreCandidate(pairInput, { id:w.id, vector:w.vector, abv:w.abv, availability:w.availability }).toFixed(2)),
+      why: w.notes || "Balanced profile complements seed item.",
+      mode: "neat",
+      pricing: undefined
+    })).sort((a,b)=> b.score - a.score).slice(0,3);
+
+    // score FOOD (simple heuristic)
+    const food: RecItem[] = (sampleFood as any[]).map(f => ({
+      id: f.id, name: f.name, type:"food",
+      score: f.score ?? 0.80, why: f.why, pricing: undefined
+    })).sort((a,b)=> b.score - a.score).slice(0,3);
+
+    // score SMOKE (if seed is drink)
+    const smoke: RecItem[] = (sampleStrain as any[]).map(s => ({
+      id: s.id, name: s.name, type:"smoke",
+      score: s.score ?? 0.82, why: s.why
+    })).sort((a,b)=> b.score - a.score).slice(0,3);
+
+    // vibe (static demo)
+    const vibe: VibeItem[] = sampleVibe as any[];
+
+    const out: SessionOut = {
+      session_id: crypto.randomUUID(),
+      seed_item, vectors, profile,
+      recommendations: { food, drink, smoke, vibe }
+    };
+
+    res.json(out);
+  } catch (e:any) {
+    res.status(500).json({ error: e.message || "pair failed" });
+  }
+});
+
+export default router;
+
+
+---
+
+🏪 backend/routes/find.ts
+
+import { Router } from "express";
+const router = Router();
+
+/** returns pricing summary + merchant list (mock until keys wired) */
+router.post("/", async (req, res) => {
+  try {
+    const { item_id, geo } = req.body || {};
+    // TODO: replace with Wine-Searcher / Jane / Weedmaps / Untappd lookups
+    const merchants = [
+      { name: "Downtown Liquors", price: 59.99, stock: "low", distance_km: 5.7, source: "wine_searcher", url: "#" },
+      { name: "Beacon Hill Wine", price: 62.99, stock: "in_stock", distance_km: 3.2, source: "wine_searcher", url: "#" },
+      { name: "City Cellar",      price: 72.00, stock: "in_stock", distance_km: 8.1, source: "wine_searcher", url: "#" }
+    ];
+    const min = Math.min(...merchants.map(m=>m.price));
+    res.json({ item_id, summary: { min_price: min, store_count: merchants.length }, merchants, geo });
+  } catch (e:any) {
+    res.status(500).json({ error: e.message || "find failed" });
+  }
+});
+
+export default router;
+
+
+---
+
+👍 backend/routes/feedback.ts
+
+import { Router } from "express";
+const router = Router();
+
+router.post("/", async (req, res) => {
+  try {
+    const { session_id, item_id, updown } = req.body || {};
+    // TODO: write to DB for reweighting
+    res.json({ ok: true, session_id, item_id, updown });
+  } catch (e:any) {
+    res.status(500).json({ error: e.message || "feedback failed" });
+  }
+});
+export default router;
+
+
+---
+
+🖥️ backend/server.ts
+
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import scan from "./routes/scan";
+import pair from "./routes/pair";
+import find from "./routes/find";
+import feedback from "./routes/feedback";
+
+const app = express();
+app.use(cors());
+app.use(express.json({ limit: "5mb" }));
+
+app.get("/", (_,res)=> res.send("PairMe API up"));
+app.use("/scan", scan);
+app.use("/pair", pair);
+app.use("/find", find);
+app.use("/feedback", feedback);
+
+const port = process.env.PORT || 3000;
+app.listen(port, ()=> console.log(`PairMe API on :${port}`));
+
+
+---
+
+🗄️ scripts/migrate.sql
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TABLE IF NOT EXISTS sessions (
+  session_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  seed JSONB NOT NULL,
+  profile JSONB,
+  vectors JSONB,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS recommendations (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  session_id UUID REFERENCES sessions(session_id),
+  type TEXT NOT NULL,
+  item JSONB NOT NULL,
+  score NUMERIC NOT NULL,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS feedback (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  session_id UUID REFERENCES sessions(session_id),
+  item_id TEXT NOT NULL,
+  updown BOOLEAN NOT NULL,
+  created_at TIMESTAMP DEFAULT now()
+);
+
+
+---
+
+🧪 data/sample/whiskey_db.json
+
+[
+  {
+    "id": "redbreast_12",
+    "style": "irish_single_pot_still",
+    "vector": {"sweet":0.6,"fruit_orchard":0.5,"fruit_tropical":0.2,"spice":0.3,"smoke":0.0,"oak":0.4},
+    "abv": 40,
+    "availability": "common",
+    "notes": "creamy, orchard fruit, honey"
+  },
+  {
+    "id": "woodford_double_oaked",
+    "style": "bourbon",
+    "vector": {"sweet":0.8,"fruit_orchard":0.3,"spice":0.2,"smoke":0.0,"oak":0.6},
+    "abv": 45.2,
+    "availability": "common",
+    "notes": "vanilla, toffee, toasted oak"
+  }
+]
+
+🧪 data/sample/food_db.json
+
+[
+  {"id":"dark_chocolate_tart","name":"Dark Chocolate Tart","why":"Bitter cocoa bridges clove/cinnamon; velvet texture frames heat.","score":0.92},
+  {"id":"smoked_brisket","name":"Smoked Brisket","why":"Smoke amplifies spice; oak tannins cut through fat.","score":0.88},
+  {"id":"aged_gouda","name":"Aged Gouda","why":"Caramel/nut echoes sweet oak; texture contrast.","score":0.85}
+]
+
+🧪 data/sample/strain_db.json
+
+[
+  {"id":"cantaloupe_haze","name":"Cantaloupe Haze","why":"Limonene brightness cuts heat; myrcene eases long sip.","score":0.91},
+  {"id":"og_kush","name":"OG Kush","why":"Caryophyllene mirrors rye spice; earthiness grounds sweetness.","score":0.87},
+  {"id":"green_crack","name":"Green Crack","why":"Citrus-pine refreshes palate between sips; energizing balance.","score":0.83}
+]
+
+🧪 data/sample/vibe_db.json
+
+[
+  {"category":"music","name":"Vaporwave Sunset","details":"90–105 BPM, warm synth","score":0.90},
+  {"category":"lighting","name":"Amber Glow 40%","details":"2700K warm, indirect","score":0.86},
+  {"category":"environment","name":"Lounge Nook","details":"Soft textiles, low noise","score":0.82},
+  {"category":"scent","name":"Cedar & Bergamot","details":"Woody + citrus","score":0.85},
+  {"category":"activity","name":"Vinyl Session","details":"Side A/B ritual","score":0.75}
+]
+
+
+---
+
+🧾 compliance/scan_report_phase1.md (template)
+
+# Compliance Scan — Baseline (Doculingo)
+
+Scope: partner ToS (Wine-Searcher, Weedmaps, Jane, Untappd, OFF), marketing copy, app disclaimers.
+
+Status: AMBER
+Findings:
+- Alcohol shipping / 3-tier rules — HIGH
+- Cannabis promotional restrictions — MED
+- Age gating, geofencing — REQUIRED
+
+Actions:
+- Implement 21+ modal & regional filters.
+- Standardize affiliate disclaimers.
+- Store TOS acknowledgments per partner.
+
+
+---
+
+📈 ops/analytics.md + ops/reweight.ts
+
+# Analytics
+
+Core metrics:
+- Merchant clicks / session
+- Thumbs-up ratio (per pane)
+- Avg score of accepted recs
+- D1, D7 retention
+- Store_count & min_price coverage
+
+Weekly:
+- Run `reweight.ts` to adjust coefficients based on feedback.
+
+// ops/reweight.ts (skeleton)
+console.log("Load feedback → compute deltas → write new weights to scoring config");
+// implement as needed
+
+
+---
+
+📌 09_Meeting/Deliverables.md (final “to-do + how-to”)
+
+# Deliverables — PairMe × Doculingo
+
+1) Connect Doculingo Bridge
+   - File: /backend/services/doculingo.ts
+   - Methods: parseLabel(), riskScan()
+   - Env: DOCULINGO_API_URL, DOCULINGO_API_KEY
+   - Test: POST /scan with {text:"Willett 4 Year Rye"}
+
+2) Parse 1k Mixed Labels
+   - Output: /data/parsed/phase0.json (1,000 entries)
+   - Include: normalized.vector + notes_raw
+   - QA: accuracy notes in this doc
+
+3) Normalize → Vectors → Live Scoring
+   - Files: /backend/engine/scoring.ts, /backend/models/schema.ts
+   - Test: POST /pair returns 4 panes with scores & “why”
+
+4) Pilot “Find It”
+   - File: /backend/routes/find.ts
+   - Return: {summary:{min_price,store_count}, merchants[]}
+   - Demo: 3 partner stubs → then real keys
+
+5) Compliance Baseline
+   - File: /compliance/scan_report_phase1.md
+   - Via: riskScan(ToS text)
+
+6) US Launch (MVP)
+   - Age gate modal, region filters (frontend)
+   - Endpoints live with keys
+
+7) Feedback Loop
+   - Tables: scripts/migrate.sql
+   - Route: POST /feedback
+   - Weekly: ops/reweight.ts
+
+8) Co-Announcement + Case Study
+   - Files: /09_Meeting/announcement.md, /08_Investor_Pack/CaseStudy.md
+
+
+---
+
+📨 09_Meeting/announcement.md (starter)
+
+**PairMe × Doculingo**
+We’re partnering to bring multilingual label intelligence and compliance to PairMe’s world-scale pairing engine. Scan once, get your whole night curated — with live availability.
+
+
+---
+
+🧭 how to test locally (curl)
+
+# scan (mock parses via Doculingo stub)
+curl -s -X POST http://localhost:3000/scan -H "Content-Type: application/json" \
+  -d '{"text":"Willett 4 Year Rye","mood":"chill","intensity":0.6}' | jq
+
+# pair (scores + 4 panes using sample data)
+curl -s -X POST http://localhost:3000/pair -H "Content-Type: application/json" \
+  -d '{
+    "seed_item":{"type":"whiskey","name":"Willett 4 Year Rye"},
+    "vectors":{"intensity":0.6,"terpenes":{},"flavor_tags":["spice","oak"]},
+    "profile":{"mood":"chill"}
+  }' | jq
+
+# find (pricing summary + merchants; mocked until keys)
+curl -s -X POST http://localhost:3000/find -H "Content-Type: application/json" \
+  -d '{"item_id":"redbreast_12","geo":{"lat":42.35,"lon":-71.06}}' | jq
+
+# feedback
+curl -s -X POST http://localhost:3000/feedback -H "Content-Type: application/json" \
+  -d '{"session_id":"demo","item_id":"redbreast_12","updown":true}' | jq
+
+
+---
+
+).
+
+
