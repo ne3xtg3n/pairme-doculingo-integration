@@ -7,7 +7,7 @@ https://github.com/ne3xtg3n/pairme-doculingo-integration/tree/main
 
 If the link requires access, request it or sign in to Lovable first.
 📦 Repository: pairme-doculingo-partner-pack/
-cp32352@gmail.com / Super91605 
+cp32352@gmail.com / See Email
 
 pairme-doculingo-partner-pack/
 ├─ README.md
