@@ -1,7 +1,7 @@
 # PairMe™ — Comprehensive Engineering Documentation (v1.2) 🌟
 
-![App Icon](assets/visuals/app-icon.png)  
-*Image: PairMe App Icon (1000023795)*
+![1000023847](https://github.com/user-attachments/assets/cc11da47-7578-475b-9531-1100f9463d90))
+  *Image: PairMe App Icon (1000023795)*
 
 **Author**: Christopher Perry  
 **Contributors**: Talor W  
@@ -147,7 +147,8 @@ pairme/
 
 PairMe™ is the world’s premier AI-driven pairing and lifestyle curation app, delivering personalized recommendations for **Food, Drink, Spark, Vibe, and Events** from a single scan. Powered by the **LabelSync Engine**, it parses labels, translates multilingual data, ensures compliance, and manages drink inventory in-house. Features include a **budget slider + optimizer**, **auto-applied coupons**, and an **Events ticketing hub**, blending Spotify’s discovery with Mint.com’s financial control.
 
-![Hero Mockup](assets/visuals/hero-mockup.png)  
+![Hero Mockup]![1000023855](https://github.com/user-attachments/assets/7c4ce1f1-9099-4d12-af28-233592577e6c)
+
 *Image: PairMe Hero Screen (1000020584)*
 
 **Outcomes**:
@@ -537,7 +538,10 @@ export async function applyCoupons(session: Session): Promise<Session> {
 <details>
 <summary>Wireframes</summary>
 
-![Session Screen](assets/visuals/session-screen.png)  
+![Session Screen]![1000023795](https://github.com/user-attachments/assets/a26890d5-ed13-4d59-be75-0607073cfd4a)![1000020589](https://github.com/user-attachments/assets/44bbbb93-8137-47a9-b80b-ca5fbb891430)
+
+![1000020606](https://github.com/user-attachments/assets/fe7c5dba-8a5e-4242-92f2-c3330c8364a7)
+)  
 *Image: PairMe Mood Pairing Screen (1000020589)*
 
 **Scan Screen**:
@@ -566,8 +570,9 @@ export async function applyCoupons(session: Session): Promise<Session> {
 **Find It Near Me**:
 - List: Merchant/event name, price, stock, distance, URL.
 - Filters: Radius, Price, Stock Status (Amber Gold).
+]
 
-![Find Near Me](assets/visuals/find-near-me.png)  
+  
 *Image: PairMe Find It Near Me Screen (1000020590)*
 
 **Settings Screen**:
