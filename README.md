@@ -1,16 +1,16 @@
 # PairMe™ — Comprehensive Engineering Documentation (v1.0)
+
 ![1000023844](https://github.com/user-attachments/assets/f105ba6b-9c78-4429-807c-f1b963dad9e3)
 
-
 **Author:** Christopher Perry  
-**Contributors:** Open for Engineering Community Input  
+**Contributors:** Talor W  
 **Status:** v1.0 (Production-Ready MVP Spec)  
 **Date:** September 23, 2025  
-**License:** License – Open for collaboration with **Dculingo**  
+**License:** No License – Open only to 1 for collaboration, Taylor W 
 
-This README provides a complete, self-contained engineering specification for building **PairMe**, an AI-driven mobile and web app that delivers personalized, cross-category pairing recommendations for **Food, Drink, Smoke, and Vibe** through a single scan (QR, barcode, or image). Integrated with **Doculingo** for multilingual label parsing and compliance, PairMe uses a deterministic scoring engine, user feedback loops, and live merchant data to create a seamless, explainable, and scalable pairing experience. The design is inspired by leading AI apps and real-world integrations (e.g., Wine-Searcher, Weedmaps)<grok:render type="render_inline_citation"><argument name="citation_id">0</argument></grok:render>.
+This README provides a complete, self-contained engineering specification for building **PairMe**, an AI-driven mobile and web app that delivers personalized, cross-category pairing recommendations for **Food, Drink, Smoke, and Vibe** through a single scan (QR, barcode, or image). Powered by an in-house **LabelSync Engine** for label parsing, translation, and compliance, PairMe uses a deterministic scoring engine, user feedback loops, and live merchant data to create a seamless, explainable, and scalable pairing experience. The design is inspired by leading AI apps and real-world integrations (e.g., Wine-Searcher, Weedmaps).
 
-All sections are organized as expandable drop-downs, consolidating the provided GitHub structure, Lovable.dev prompt, and additional files into a professional, investor-grade, and USPTO-ready format. This documentation enables engineers to develop, test, deploy, and patent the system. It includes code snippets, schemas, compliance details, and a patent draft outline, optimized for scalability to millions of users.
+All sections are organized as expandable drop-downs, consolidating the provided GitHub structure and additional requirements into a professional, investor-grade, and USPTO-ready format. This documentation enables engineers to develop, test, deploy, and patent the system without external dependencies. It includes code snippets, schemas, compliance details, a patent draft outline, and embedded visuals optimized for scalability to millions of users.
 
 Use this for the full build: Set up infrastructure, code the backend/frontend, integrate APIs, test compliance, and file patents. Focus on precision engineering for global deployment.
 
@@ -36,7 +36,7 @@ pairme/
 │   │   ├── index.js
 │   │   ├── services/
 │   │   │   ├── db.js
-│   │   │   ├── doculingo.js
+│   │   │   ├── labelsync.js
 │   │   │   ├── personalization.js
 │   │   │   ├── analytics.js
 │   │   ├── middleware/
@@ -100,6 +100,13 @@ pairme/
 │   ├── analytics.md
 ├── postman/
 │   ├── PairMe.postman_collection.json
+├── assets/
+│   ├── visuals/
+│   │   ├── hero-mockup.png
+│   │   ├── session-screen.png
+│   │   ├── find-near-me.png
+│   │   ├── coupon-book.png
+│   │   ├── app-icon.png
 ```
 
 ---
@@ -109,12 +116,14 @@ pairme/
 <details>
 <summary>00_CONCEPT - Vision</summary>
 
-PairMe is the world’s most advanced pairing hub, delivering curated **Food, Drink, Smoke, and Vibe** recommendations from a single scan (QR, barcode, or image). Powered by a deterministic scoring engine and integrated with **Doculingo** for multilingual label parsing and compliance, PairMe learns user preferences through feedback, adapts to evolving tastes, and provides live merchant availability. It’s an **AI sommelier, budtender, and DJ** in your pocket, designed for global scalability.
+PairMe is the world’s most advanced pairing hub, delivering curated **Food, Drink, Smoke, and Vibe** recommendations from a single scan (QR, barcode, or image). Powered by an in-house **LabelSync Engine** for label parsing, translation, and compliance, PairMe learns user preferences through feedback, adapts to evolving tastes, and provides live merchant availability. It’s an **AI sommelier, budtender, and DJ** in your pocket, designed for global scalability.
+
+<img width="1024" height="1024" alt="1000020589" src="https://github.com/user-attachments/assets/46cf5cdb-68e4-48d6-90b4-4191c5290c17" />
 
 **Outcomes**
 - **Personalization**: 95% user satisfaction with tailored pairings; adapts within 1–2 sessions.
 - **Efficiency**: <2s to generate a Session page with 4 recommendation windows.
-- **Compliance**: Meets alcohol/cannabis regulations via Doculingo risk scans.
+- **Compliance**: Meets alcohol/cannabis regulations via LabelSync risk scans.
 - **Engagement**: 70% day-1 retention; 40% merchant click-through rate.
 - **Scalability**: Supports 10M+ users with low-latency APIs and vector search.
 
@@ -124,7 +133,7 @@ PairMe is the world’s most advanced pairing hub, delivering curated **Food, Dr
 - **Buyers**: Consumers ($4.20/mo premium); businesses ($32/mo for loyalty tools).
 
 **Market Validation**
-- **Pain Points**: Siloed apps (wine-only, dispensary-only); no cross-category pairing; no live inventory (80% user frustration)<grok:render type="render_inline_citation"><argument name="citation_id">0</argument></grok:render>.
+- **Pain Points**: Siloed apps (wine-only, dispensary-only); no cross-category pairing; no live inventory (80% user frustration).
 - **Opportunity**: $1.5B+ pairing/recommendation market; 12% CAGR (2025–2030).
 - **Competitors**: Wine-Searcher (wine-focused), Untappd (beer-only); none offer cross-category or image-based pairing.
 
@@ -135,7 +144,7 @@ PairMe is the world’s most advanced pairing hub, delivering curated **Food, Dr
 
 Users juggle fragmented apps for food, drink, and cannabis pairings, with no cross-category intelligence or live availability. Compliance risks (e.g., alcohol/cannabis laws) and inconsistent label data across regions hinder global adoption. PairMe solves this with:
 - **Unified Pairing**: One scan delivers Food, Drink, Smoke, Vibe recommendations.
-- **Doculingo Integration**: Multilingual OCR, normalization, and compliance scans.
+- **LabelSync Engine**: In-house OCR, multilingual normalization, and compliance scans.
 - **Explainable AI**: Transparent “Why it Works” reasoning builds trust.
 - **Live Inventory**: Merchant data via partner APIs (Wine-Searcher, Weedmaps).
 
@@ -181,7 +190,7 @@ Users juggle fragmented apps for food, drink, and cannabis pairings, with no cro
 - **Weedmaps/Jane**: Dispensary menus, no vibe or food pairing.
 - **Gap**: No app combines cross-category pairing, image scanning, and live inventory.
 **Adoption Drivers**: 80% want integrated pairing; 65% prioritize availability.
-**Strategy**: Pilot in US (Q1 2026); expand to EU/Asia with Doculingo’s multilingual support.
+**Strategy**: Pilot in US; expand to EU/Asia with LabelSync’s multilingual support.
 **SWOT**:
 - **Strengths**: Cross-category, explainable AI, compliance-ready.
 - **Weaknesses**: API dependency, initial data seeding.
@@ -208,9 +217,10 @@ Users juggle fragmented apps for food, drink, and cannabis pairings, with no cro
 **Search**: Meilisearch/Elasticsearch + `pgvector` for flavor embeddings.  
 **AI**: Deterministic scoring (cosine similarity) + LLM for creative suggestions.  
 **Storage**: S3-compatible for images/labels.  
-**Integrations**: Wine-Searcher, Weedmaps, Jane, Untappd, Open Food Facts, Doculingo.  
+**LabelSync Engine**: In-house OCR (Tesseract.js), multilingual translation (Hugging Face transformers), and compliance scans (rule-based engine).  
+**Integrations**: Wine-Searcher, Weedmaps, Jane, Untappd, Open Food Facts.  
 **Pipelines**:
-- **Ingestion**: Cron/webhooks pull partner data; Doculingo normalizes labels.
+- **Ingestion**: Cron/webhooks pull partner data; LabelSync normalizes labels.
 - **Scoring**: Ranks candidates by flavor vectors, mood, availability.
 - **Find-It**: Geo-based merchant lookup with pricing.
 
@@ -372,31 +382,33 @@ export function scoreCandidate(seed: PairInput, c: Candidate): number {
 - **Authentication**: Argon2 hashing, JWT (access/refresh tokens), CSRF protection.
 - **Age Gating**: 21+ modal; photo ID or third-party verification.
 - **Geofencing**: Region-based content filtering (e.g., hide cannabis where illegal).
-- **Compliance**: Doculingo scans for alcohol/cannabis ToS risks; 3-tier alcohol law adherence.
+- **Compliance**: LabelSync scans for alcohol/cannabis regulatory risks; 3-tier alcohol law adherence.
 - **Data Privacy**: GDPR/CCPA-compliant; opt-out for data retention.
 
 </details>
 
 <details>
-<summary>02_INTEGRATION_DOCULINGO - Overview</summary>
+<summary>02_INTEGRATION_LABELSYNC - Overview</summary>
 
-Doculingo provides critical capabilities:
-1. **Label OCR & Translation**: Parses multilingual labels (e.g., Japanese whisky, French wine) into structured JSON with flavor vectors.
-2. **Document Normalization**: Standardizes tasting notes across partner APIs.
-3. **Compliance Risk Scans**: Flags ToS issues for alcohol/cannabis partners.
+The **LabelSync Engine** is an in-house solution providing:
+1. **Label OCR & Extraction**: Processes images (QR, barcode, labels) into structured JSON using Tesseract.js.
+2. **Multilingual Translation**: Translates labels (e.g., Japanese whisky, French wine) using Hugging Face transformers.
+3. **Compliance Risk Scans**: Rule-based engine flags alcohol/cannabis regulatory issues.
+4. **Normalization**: Converts raw tasting notes into flavor vectors for the pairing engine.
 
 **Integration Points**:
-- **Scan Pipeline**: `/scan` endpoint calls Doculingo’s `parseLabel` for OCR/translation.
-- **Risk Scans**: `/compliance/scan` endpoint for partner contract analysis.
+- **Scan Pipeline**: `/scan` endpoint calls LabelSync’s `parseLabel` for OCR and translation.
+- **Risk Scans**: `/compliance/scan` endpoint for regulatory analysis.
 - **Data Flow**: Parsed labels → flavor vectors → scoring engine.
 
 </details>
 
 <details>
-<summary>02_INTEGRATION_DOCULINGO - Label OCR & Translation</summary>
+<summary>02_INTEGRATION_LABELSYNC - Label OCR & Translation</summary>
 
 ```javascript
-import axios from 'axios';
+import Tesseract from 'tesseract.js';
+import { pipeline } from '@huggingface/transformers';
 
 type ParseInput = { imageUrl?: string; pdfUrl?: string; rawText?: string; localeHint?: string };
 type ParseOutput = {
@@ -409,13 +421,48 @@ type ParseOutput = {
   };
 };
 
-const baseURL = process.env.DOCULINGO_API_URL;
-const key = process.env.DOCULINGO_API_KEY;
+const translator = await pipeline('translation', 'Helsinki-NLP/opus-mt-{from}-{to}');
 
 export async function parseLabel(input: ParseInput): Promise<ParseOutput> {
-  if (!baseURL || !key) throw new Error('Doculingo env not set');
-  const { data } = await axios.post(`${baseURL}/parseLabel`, input, { headers: { Authorization: `Bearer ${key}` } });
-  return data;
+  let ocrText = input.rawText || '';
+  if (input.imageUrl) {
+    const { data: { text } } = await Tesseract.recognize(input.imageUrl, input.localeHint || 'eng');
+    ocrText = text;
+  }
+
+  let translation = null;
+  if (input.localeHint && input.localeHint !== 'eng') {
+    translation = await translator(ocrText, { src_lang: input.localeHint, tgt_lang: 'en' });
+  }
+
+  const normalized = normalizeLabel(ocrText); // Custom regex-based parser
+  return {
+    ocr: ocrText,
+    translation: translation ? { from: input.localeHint, to: 'en', text: translation[0].translation_text } : null,
+    normalized,
+  };
+}
+
+function normalizeLabel(text: string) {
+  const brand = text.match(/brand:\s*(\w+)/i)?.[1];
+  const product = text.match(/product:\s*([\w\s]+)/i)?.[1];
+  const abv = parseFloat(text.match(/(\d+\.?\d*)%\s*ABV/i)?.[1] || '0');
+  const size_ml = parseInt(text.match(/(\d+)\s*m[lL]/i)?.[1] || '0');
+  const region = text.match(/region:\s*(\w+)/i)?.[1];
+  const notes = text.match(/notes:\s*([\w,\s]+)/i)?.[1]?.split(',').map(s => s.trim()) || [];
+
+  const vector = {
+    sweet: notes.includes('sweet') ? 0.3 : 0,
+    spice: notes.includes('spice') ? 0.7 : 0,
+    oak: notes.includes('oak') ? 0.5 : 0,
+    smoke: notes.includes('smoke') ? 0.1 : 0,
+    fruit_orchard: notes.includes('fruit') ? 0.3 : 0,
+    fruit_tropical: notes.includes('tropical') ? 0.2 : 0,
+    citrus: notes.includes('citrus') ? 0.2 : 0,
+    herbal: notes.includes('herbal') ? 0.4 : 0,
+  };
+
+  return { brand, product, abv, size_ml, region, notes_raw: notes, vector };
 }
 ```
 
@@ -439,15 +486,25 @@ export async function parseLabel(input: ParseInput): Promise<ParseOutput> {
 </details>
 
 <details>
-<summary>02_INTEGRATION_DOCULINGO - Compliance Risk Scans</summary>
+<summary>02_INTEGRATION_LABELSYNC - Compliance Risk Scans</summary>
 
 ```javascript
 type RiskFinding = { clause: string; severity: 'low' | 'med' | 'high'; note: string };
 type RiskOutput = { status: 'GREEN' | 'AMBER' | 'RED'; findings: RiskFinding[] };
 
+const complianceRules = [
+  { pattern: /alcohol.*ship/i, severity: 'high', note: 'Requires 3-tier compliant partner' },
+  { pattern: /cannabis.*promo/i, severity: 'med', note: 'Age gating & regional filters needed' },
+  { pattern: /data.*retention/i, severity: 'low', note: 'GDPR/CCPA compliance required' },
+];
+
 export async function riskScan(docText: string): Promise<RiskOutput> {
-  const { data } = await axios.post(`${baseURL}/riskScan`, { text: docText }, { headers: { Authorization: `Bearer ${key}` } });
-  return data;
+  const findings: RiskFinding[] = complianceRules
+    .filter(rule => rule.pattern.test(docText))
+    .map(rule => ({ clause: rule.pattern.source, severity: rule.severity, note: rule.note }));
+  const status = findings.some(f => f.severity === 'high') ? 'RED' :
+                 findings.some(f => f.severity === 'med') ? 'AMBER' : 'GREEN';
+  return { status, findings };
 }
 ```
 
@@ -456,8 +513,8 @@ export async function riskScan(docText: string): Promise<RiskOutput> {
 {
   "status": "AMBER",
   "findings": [
-    { "clause": "Alcohol shipping across state lines", "severity": "high", "note": "Requires 3-tier compliant partner" },
-    { "clause": "Cannabis promotional restrictions", "severity": "med", "note": "Age gating & regional filters needed" }
+    { "clause": "alcohol.*ship", "severity": "high", "note": "Requires 3-tier compliant partner" },
+    { "clause": "cannabis.*promo", "severity": "med", "note": "Age gating & regional filters needed" }
   ]
 }
 ```
@@ -465,27 +522,30 @@ export async function riskScan(docText: string): Promise<RiskOutput> {
 </details>
 
 <details>
-<summary>02_INTEGRATION_DOCULINGO - Joint Roadmap</summary>
+<summary>02_INTEGRATION_LABELSYNC - Roadmap</summary>
 
-**Phase 0 (Week 1–2)**:
-- Connect Doculingo Bridge to `/scan` endpoint.
+**Phase 0**:
+- Build LabelSync Engine with Tesseract.js and Hugging Face transformers.
 - Parse 1k mixed labels (whisky, wine, cannabis, food).
 - Output: `data/parsed/phase0.json`.
 
-**Phase 1 (Week 3–6)**:
+**Phase 1**:
+- Integrate LabelSync into `/scan` endpoint for OCR and translation.
 - Normalize labels → flavor vectors → live scoring in `/pair`.
 - Pilot `/find` with 3 partner APIs (Wine-Searcher, Weedmaps, Untappd).
 - Baseline compliance scans (`docs/compliance-report.md`).
 
-**Phase 2 (Week 7–12)**:
+**Phase 2**:
 - US regional launch with age gating, geofencing.
 - Feedback loop via `/feedback` and weekly reweighting.
-- Co-announcement with Doculingo; publish case study.
+- Publish LabelSync case study for engineering community.
 
 </details>
 
 <details>
 <summary>03_UX - Wireframes</summary>
+
+<img width="1024" height="1024" alt="1000020584" src="https://github.com/user-attachments/assets/6a35e28e-0468-4dde-bd3c-1944a81cfcf1" />
 
 **Scan Screen**:
 - Camera feed, QR/barcode scanner, manual search bar.
@@ -495,6 +555,8 @@ export async function riskScan(docText: string): Promise<RiskOutput> {
 - 4 windows: Food, Drink, Smoke, Vibe.
 - Each: 3 Quick Recs, 1 AI Idea, “Why it Works” modal.
 - Controls: Mood (Chill, Creative, Social, Sleep), Intensity (0–1), Mode (Neat, Big Ice, Highball).
+
+<img width="1024" height="1024" alt="1000020590" src="https://github.com/user-attachments/assets/7a2f47c4-141c-4e4a-bfb8-ac10487821cc" />
 
 **Find It Near Me**:
 - List: Merchant name, price, stock, distance, URL.
@@ -510,7 +572,7 @@ export async function riskScan(docText: string): Promise<RiskOutput> {
 <details>
 <summary>03_UX - Session Flow</summary>
 
-1. **Scan**: User scans QR/barcode/image → Doculingo parses → seed item + vectors.
+1. **Scan**: User scans QR/barcode/image → LabelSync parses → seed item + vectors.
 2. **Pair**: Scoring engine generates recommendations for 4 windows.
 3. **Display**: Session page renders Food, Drink, Smoke, Vibe with scores and “Why”.
 4. **Find**: User taps “Find It Near Me” → merchant list with pricing.
@@ -532,9 +594,40 @@ Each recommendation includes:
 </details>
 
 <details>
+<summary>03_UX - Visual Style Guide</summary>
+
+**Colors**:
+- Deep Indigo: `#1E1A39` (backdrop, headers).
+- Neon Teal: `#00FFC6` (AI glow, buttons).
+- Amber Gold: `#FFB300` (coupons, pricing).
+- Crimson Red: `#E63946` (alerts, timers).
+- White: `#FFFFFF` (text, overlays).
+- Neutral Gray: `#4A4A4A` (secondary text).
+
+**Typography**:
+- Headings: Inter Bold (24–32px).
+- Body: SF Pro/Roboto Regular (14–16px).
+- Captions: Inter Italic (12px for “Why it Works”).
+
+**Tone**:
+- Cinematic gradients (Indigo to Teal), glowing edges.
+- High-res lifestyle images (whiskey pours, cannabis jars, charcuterie).
+- Micro-animations (e.g., scanner pulse, tile flips).
+
+**Iconography**:
+- Custom SVG icons: Food (fork), Drink (glass), Smoke (leaf), Vibe (music note).
+- Neon Teal for active; Gray for inactive.
+
+**Motion**:
+- 300ms transitions, 200ms button hovers.
+- Optimize for 60fps on mid-tier devices.
+
+</details>
+
+<details>
 <summary>04_GTM - Launch Plan</summary>
 
-- **Region**: US pilot (Q1 2026); state-aware compliance.
+- **Region**: US pilot; state-aware compliance.
 - **Channels**: TikTok/IG reels (“Scan → Curate Your Night”); influencer collabs (whiskey, budtenders, foodies).
 - **Beta**: Invite-only codes at bars/dispensaries; 10K users.
 - **KPIs**: 70% D1 retention, 40% merchant clicks, 80% thumbs-up rate.
@@ -567,9 +660,8 @@ Each recommendation includes:
 <summary>04_GTM - Partnerships</summary>
 
 - **Data Partners**: Wine-Searcher, Weedmaps, Jane, Untappd, Open Food Facts.
-- **Doculingo**: OCR, translation, compliance scans.
 - **Terms**: Licensed APIs, no scraping; shared attribution for merchant traffic.
-- **Joint PR**: Co-announce with Doculingo for multilingual launch.
+- **Joint PR**: Announce LabelSync Engine as a breakthrough for in-house parsing.
 
 </details>
 
@@ -580,7 +672,7 @@ Each recommendation includes:
 - **Geofencing**: Hide restricted items (e.g., cannabis in illegal states).
 - **Responsible Use**: “Don’t drive impaired” reminders; no medical claims.
 - **Alcohol/Cannabis Laws**: 3-tier compliance; marketing restrictions.
-- **Doculingo Scans**: ToS analysis for partners; clause library for shipping/data.
+- **LabelSync Scans**: Regulatory analysis for partners; clause library for shipping/data.
 
 </details>
 
@@ -596,14 +688,14 @@ Each recommendation includes:
 **Actions**:
 - Implement 21+ modal and geofencing.
 - Standardize affiliate disclosures.
-- Store ToS acknowledgments.
+- Store regulatory acknowledgments.
 
 </details>
 
 <details>
 <summary>06_OPERATIONS - Content Ops</summary>
 
-- **Queue**: Auto-ingest → Doculingo confidence score → human review if <0.8.
+- **Queue**: Auto-ingest → LabelSync confidence score → human review if <0.8.
 - **SLA**: 24–48h to publish new labels/strains.
 - **Taxonomy**: Versioned flavor tags; rollback safe.
 
@@ -634,10 +726,10 @@ Each recommendation includes:
 
 **PairMe**: AI-driven pairing hub for Food, Drink, Smoke, Vibe with live merchant availability.  
 - **Problem**: Fragmented apps; no cross-category pairing; no inventory integration.  
-- **Solution**: Scan → Session with 4 curated windows; Doculingo for global labels.  
+- **Solution**: Scan → Session with 4 curated windows; LabelSync for in-house parsing.  
 - **Market**: $1.5B+; 12% CAGR.  
 - **Traction**: 10K beta users; 70% D1 retention target.  
-- **Ask**: $500K for US launch; Doculingo partnership for compliance.
+- **Ask**: $500K for US launch; scale LabelSync for global markets.
 
 </details>
 
@@ -647,7 +739,7 @@ Each recommendation includes:
 1. Vision: World’s most complete pairing app.  
 2. Problem: Siloed apps, no live inventory.  
 3. Solution: Scan → Curated night with explainable AI.  
-4. Tech: Doculingo bridge, scoring engine, APIs.  
+4. Tech: LabelSync Engine, scoring engine, APIs.  
 5. Compliance: Age gating, risk scans.  
 6. GTM: US pilot, influencer campaigns.  
 7. Business Model: Subscriptions, affiliate revenue.  
@@ -660,18 +752,18 @@ Each recommendation includes:
 <details>
 <summary>08_IP_LEGAL - Patent Draft</summary>
 
-**Title**: Adaptive Cross-Category Pairing System with Multilingual Label Parsing  
+**Title**: Adaptive Cross-Category Pairing System with In-House Label Parsing  
 **Inventors**: Christopher Perry  
-**Abstract**: A mobile/web app for personalized pairing recommendations across food, drink, smoke, and vibe, using image-based scanning, a deterministic scoring engine with user feedback, and Doculingo for multilingual label parsing and compliance. Novel features include a user-controlled taste decay algorithm and explainable recommendations.  
+**Abstract**: A mobile/web app for personalized pairing recommendations across food, drink, smoke, and vibe, using image-based scanning, a deterministic scoring engine with user feedback, and an in-house LabelSync Engine for OCR, translation, and compliance. Novel features include a user-controlled taste decay algorithm and explainable recommendations.  
 **Claims**:
 1. A method for cross-category pairing using image-based input and flavor vectors.
-2. A system for multilingual label parsing via Doculingo integration.
+2. A system for in-house label parsing via LabelSync Engine.
 3. A user interface for controlling taste decay half-life.  
 **Drawings**:
 - FIG.1: System architecture (client-server-API flow).
 - FIG.2: Scan-to-Session UX flow.
 - FIG.3: Taste Refresh Slider UI.  
-**Predicate**: US20230153654A1 (AI recommendation systems)<grok:render type="render_inline_citation"><argument name="citation_id">0</argument></grok:render>.
+**Predicate**: US20230153654A1 (AI recommendation systems).
 
 </details>
 
@@ -679,8 +771,8 @@ Each recommendation includes:
 <summary>08_IP_LEGAL - Licensing</summary>
 
 - **License**: MIT; open for collaboration.
-- **Patents**: Provisional filing for scoring engine, taste decay, and Doculingo integration.
-- **Partner Contracts**: Signed agreements for API usage; Doculingo ToS scans.
+- **Patents**: Provisional filing for scoring engine, taste decay, and LabelSync integration.
+- **Partner Contracts**: Signed agreements for API usage; LabelSync scans for compliance.
 
 </details>
 
@@ -693,7 +785,7 @@ git clone https://github.com/your-username/pairme-api.git
 cd pairme-api
 npm ci
 cp .env.example .env
-# Edit .env: DATABASE_URL, DOCULINGO_API_KEY, WINESRCH_KEY, etc.
+# Edit .env: DATABASE_URL, WINESRCH_KEY, etc.
 npm run migrate
 npm start
 ```
@@ -798,10 +890,10 @@ jobs:
 <details>
 <summary>10_TESTING - Test Plan</summary>
 
-- **Unit Tests**: Jest for backend (routes, services); Jest-Expo for frontend (screens).
+- **Unit Tests**: Jest for backend (routes, services, LabelSync); Jest-Expo for frontend (screens).
 - **Integration Tests**: Postman collection for API endpoints.
 - **Load Testing**: 1K concurrent `/pair` requests; target <500ms P95.
-- **Compliance Tests**: Doculingo risk scans on 100 partner ToS documents.
+- **Compliance Tests**: LabelSync risk scans on 100 partner ToS documents.
 - **Usability**: 95% task completion rate in beta (100 users).
 
 </details>
@@ -843,7 +935,7 @@ describe('Pair API', () => {
 <summary>11_APPENDICES - Risk Assessment FMEA</summary>
 
 - **Failure**: API downtime (RPN: 40; mitigated by Redis cache, failover).
-- **Failure**: Incorrect label parsing (RPN: 30; mitigated by Doculingo QA).
+- **Failure**: Incorrect label parsing (RPN: 30; mitigated by LabelSync QA).
 - **Failure**: Compliance violation (RPN: 60; mitigated by risk scans, geofencing).
 
 </details>
@@ -851,7 +943,7 @@ describe('Pair API', () => {
 <details>
 <summary>11_APPENDICES - Change Log</summary>
 
-- **v1.0**: Production-ready MVP with Doculingo integration, scoring engine, and merchant lookup.
+- **v1.0**: Production-ready MVP with LabelSync Engine, scoring engine, and merchant lookup.
 
 </details>
 
@@ -863,6 +955,193 @@ describe('Pair API', () => {
 - “More vibe options.” (Added scent, activity categories).
 
 </details>
+
+---
+
+## 🎨 PairMe Visual Master Pack (Detailed Plan)
+
+### 1. 🎯 Master Style Guide
+
+#### Colors
+| Name          | Hex       | Usage                                    |
+|---------------|-----------|------------------------------------------|
+| Deep Indigo   | `#1E1A39` | Primary backdrop, headers, dark mode     |
+| Neon Teal     | `#00FFC6` | AI glow, buttons, active states, accents |
+| Amber Gold    | `#FFB300` | Coupons, pricing, loyalty highlights     |
+| Crimson Red   | `#E63946` | Alerts, timers, urgent CTAs              |
+| White         | `#FFFFFF` | Text, overlays, clean backgrounds        |
+| Neutral Gray  | `#4A4A4A` | Secondary text, inactive states          |
+
+- **Palette Logic**: Indigo conveys luxury and trust (think high-end whiskey bars). Neon Teal adds a futuristic, AI-driven edge. Amber Gold screams value and exclusivity for merchants/users. Crimson Red creates urgency for timed deals.
+- **Accessibility**: High contrast ratios (e.g., White on Indigo = 15:1) ensure WCAG 2.1 AA compliance for readability.
+
+#### Typography
+| Font          | Style            | Usage                                    |
+|---------------|------------------|------------------------------------------|
+| Inter         | Bold (700)       | Headings, screen titles, CTAs            |
+| SF Pro (iOS) / Roboto (Android) | Regular (400) | Body text, descriptions, labels         |
+| Inter         | Italic (400)     | “Why it Works” explanations, captions    |
+
+- **Sizes**:
+  - Headings: 24–32px (H1), 18–22px (H2).
+  - Body: 14–16px.
+  - Captions: 12px (italicized for flavor notes).
+- **Logic**: Inter Bold is modern and tech-forward, aligning with PairMe’s AI-driven identity. SF Pro/Roboto ensures native platform familiarity. Italics add a personal, curated touch for explainability.
+- **Fallbacks**: System fonts (San Francisco, Roboto) for performance; Google Fonts for web.
+
+#### Style Tone
+- **Cinematic**: Gradient overlays (Indigo to Teal), soft glowing edges, and subtle motion (e.g., pulsing CTAs).
+- **Premium**: High-resolution lifestyle imagery (e.g., whiskey pours, cannabis jars, charcuterie boards) sourced from Unsplash-style libraries or custom shoots.
+- **Interactive**: Micro-animations (e.g., scanner pulse, tile flips for recommendations) to make the app feel alive.
+- **Consistency**: Border-radius (8px) for buttons/cards, 16px margins, 4px shadows for depth.
+
+#### Iconography
+- **Custom Icons**: Minimalist, line-based icons for Food (fork), Drink (glass), Smoke (leaf), Vibe (music note).
+- **Dynamic States**: Glow effect (Neon Teal) for active icons; Gray for inactive.
+- **Scalability**: SVG format for crisp rendering at all sizes (32px for app, 128px for marketing).
+
+#### Motion Guidelines
+- **Transitions**: 300ms ease-in-out for screen changes; 200ms for button hovers.
+- **Animations**: Subtle pulses for scanner, fade-ins for recommendation tiles, slide-up for modals.
+- **Performance**: Optimize for 60fps on mid-tier devices (e.g., iPhone 12, Galaxy A54).
+
+---
+
+### 2. 📱 App Experience Images
+
+#### App Icon (1024x1024)
+- **Design**: A bold “P” (Inter Bold) centered on a Deep Indigo gradient (top-left) to Neon Teal (bottom-right). Four micro-icons (Food, Drink, Smoke, Vibe) subtly embedded in corners, glowing in Amber Gold.
+- **Effect**: 3D embossed look with a soft Teal glow.
+- **Usage**: App Store, Google Play, home screen.
+
+![1000023795](https://github.com/user-attachments/assets/c2c6686f-73c8-4ccb-afea-959bf4af5fb9)
+
+#### Hero Screen Mockup
+- **Design**: iPhone 16 frame showing the Scan Screen: a whiskey bottle in the camera viewfinder, Neon Teal scanner frame pulsing, and a “Scan Now” CTA in Amber Gold. Background fades to Indigo with a tagline overlay: “Scan Once. Curate Your Night.”
+- **Details**: Show a partial Session Screen preview (tiles for Food, Drink, Smoke, Vibe) sliding in from the right.
+- **Usage**: App Store feature graphic, website hero, pitch decks.
+
+#### Mood Pairing Screen
+- **Design**: A cinematic 2x2 grid (Food, Drink, Smoke, Vibe) with high-res lifestyle images (e.g., charcuterie, whiskey pour, cannabis jar, neon playlist). Each tile has a score (e.g., “0.92”) in Neon Teal and a “Why” button (Inter Italic). Mood selector (Chill, Creative, Social, Sleep) at the top in Amber Gold.
+- **Details**: Subtle animations (tiles flip to reveal “Why it Works” text). Deep Indigo background with gradient overlays.
+- **Usage**: App Store screenshots, social media reels.
+
+<img width="1024" height="1024" alt="1000020589" src="https://github.com/user-attachments/assets/46cf5cdb-68e4-48d6-90b4-4191c5290c17" />
+
+#### Coupon Book UI
+- **Design**: A scrollable list of coupons ($50+ items) with Amber Gold price tags and Crimson Red countdown timers (e.g., “3h left”). Each coupon card has a merchant logo, deal details, and a “Redeem” CTA in Neon Teal.
+- **Details**: Glowing edges on active coupons; “PairPoints Earned” badge in White.
+- **Usage**: App Store preview, merchant pitches.
+
+#### Find Near Me Modal
+- **Design**: A modal with a list of merchants (name, price, distance, stock status) and a mini-map with pins (Neon Teal for in-stock, Gray for out-of-stock). Filter buttons (Radius, Price, Stock) in Amber Gold.
+- **Details**: Clean White background with Indigo headers. “Open in Maps” CTA in Neon Teal.
+- **Usage**: App Store screenshots, user onboarding.
+
+<img width="1024" height="1024" alt="1000020590" src="https://github.com/user-attachments/assets/7a2f47c4-141c-4e4a-bfb8-ac10487821cc" />
+
+---
+
+### 3. 📊 Investor / Deck Graphics
+
+#### Business Model Infographic
+- **Design**: A playful split-screen: Left side shows “Customer ($4.20/mo)” with icons for AI Coupon Book, PairPoints, and mood pairings; right side shows “Business ($32/mo)” with icons for coupons, loyalty tools, and analytics. Neon Teal arrows connect both to PairMe’s logo in the center.
+- **Details**: Amber Gold highlights for revenue streams (subscriptions, affiliate CPA). Deep Indigo background for contrast.
+- **Usage**: Pitch deck slide, investor one-pager.
+
+#### Engagement Flywheel
+- **Design**: A circular diagram showing “User Scans → PairMe Recommends → Merchant Sales → User Rewards → More Scans.” Each step has a lifestyle image (e.g., whiskey pour, dispensary shelf) and metrics (e.g., “70% D1 retention”). Neon Teal arrows, Amber Gold metrics.
+- **Details**: Deep Indigo canvas with White text for readability.
+- **Usage**: Pitch deck, website explainer.
+
+#### Market Opportunity Graph
+- **Design**: A 2D plot with PairMe at the center (Neon Teal dot) vs. competitors (Wine-Searcher, Untappd, Weedmaps) on axes: X (Cross-Category Pairing), Y (Live Inventory). PairMe dominates top-right quadrant. Market size ($1.5B, 12% CAGR) in Amber Gold text.
+- **Details**: Simple White background with Indigo gridlines.
+- **Usage**: Pitch deck, investor one-pager.
+
+---
+
+### 4. 🏪 Merchant-Facing Assets
+
+#### Merchant Dashboard Mockup
+- **Design**: A laptop screen showing a dashboard with tabs: “Coupons,” “Analytics,” “Loyalty.” Coupon tab shows a form to upload deals (e.g., “$50+ whiskey, 10% off”). Analytics tab shows charts (views, redemptions) in Neon Teal. Loyalty tab shows PairPoints multipliers in Amber Gold.
+- **Details**: Indigo sidebar, White content area, Crimson Red for unpublished coupons.
+- **Usage**: Merchant pitch deck, onboarding guide.
+
+#### Verified Merchant Shield
+- **Design**: A badge with a Neon Teal checkmark inside an Amber Gold shield, labeled “PairMe Verified.” Subtle Indigo gradient background.
+- **Details**: SVG format for scalability; 128x128px default.
+- **Usage**: Merchant websites, in-app “Find Near Me” listings.
+
+---
+
+### 5. 🌍 Lifestyle & Marketing Assets
+
+#### Lifestyle Collage
+- **Design**: A 4-quadrant collage: Food (charcuterie board), Drink (whiskey pour with ice), Smoke (cannabis jar with swirling smoke), Vibe (vinyl record spinning under neon lights). Each quadrant has a Neon Teal frame and a subtle PairMe logo watermark.
+- **Details**: High-res (1920x1080), cinematic lighting, Indigo-to-Teal gradient overlay.
+- **Usage**: Instagram/TikTok posts, website backgrounds.
+
+<img width="1024" height="1024" alt="1000020584" src="https://github.com/user-attachments/assets/6a35e28e-0468-4dde-bd3c-1944a81cfcf1" />
+
+#### Social Promo Image
+- **Design**: A phone mockup showing the Session Screen (Food, Drink, Smoke, Vibe tiles) with a glowing Neon Teal border. Tagline: “Scan Once. Curate Your Night.” in Inter Bold (White). Amber Gold CTA button: “Download Now.”
+- **Details**: 1080x1080 for Instagram; 1920x1080 for X banners.
+- **Usage**: Social media ads, App Store carousel.
+
+#### Launch Teaser Poster
+- **Design**: A minimalist Deep Indigo background with the PairMe logo glowing in Neon Teal. Tagline: “Unlock Your Night.” in Inter Bold (White). Subtle lifestyle images (whiskey glass, cannabis leaf) fading into corners.
+- **Details**: 24x36in for physical posters; 1080x1920 for digital.
+- **Usage**: Bar/dispensary posters, launch event banners.
+
+---
+
+### 6. ✅ Implementation Plan
+
+#### Step 1: Finalize Style Guide 
+- **Action**: Approve colors, typography, and tone above.
+- **Output**: `pairme/docs/style-guide.md` with Hex codes, font files, and icon SVGs.
+- **Tool**: Figma for style guide creation; export as PDF for team.
+
+#### Step 2: Generate Mockups 
+- **Action**: Create high-fidelity mockups for App Icon, Hero Screen, Mood Pairing Screen, Coupon Book, Find Near Me, and Investor/Merchant assets.
+- **Tools**:
+  - Figma for static designs (App Store, pitch deck).
+  - Adobe After Effects for animations (scanner pulse, tile flips).
+  - Unsplash or custom photography for lifestyle images.
+- **Output**: `pairme/assets/mockups/` with PNGs (1920x1080) and SVGs for icons.
+
+#### Step 3: Integrate into App 
+- **Action**: Update `pairme-app/src/` with new assets and CSS:
+  - `src/config.js`: Add color constants (`COLORS.DEEP_INDIGO = '#1E1A39'`).
+  - `assets/`: Store icons, images, and animations.
+  - `src/screens/`: Apply styles to ScanScreen, SessionScreen, etc.
+- **Tools**: React Native (Expo) for mobile; Tailwind CSS for web (`reset-web`).
+- **Output**: Updated app with consistent visuals; test on iOS 18, Android 15.
+
+#### Step 4: Marketing Rollout 
+- **Action**: Deploy Lifestyle Collage, Social Promo, and Teaser Poster to:
+  - TikTok/Instagram: 15s reels showing scan → pairing flow.
+  - X: Posts with #PairMeNight hashtag.
+  - App Store/Google Play: Update screenshots and feature graphic.
+- **Tools**: Canva for quick social edits; Hootsuite for scheduling.
+- **Output**: `pairme/docs/marketing-plan.md` with campaign schedule.
+
+#### Step 5: User Testing & Iteration (Ongoing)
+- **Action**: Beta test visuals with 100 users; measure engagement (clicks on CTAs, time on Session Screen).
+- **Metrics**: 95% task completion rate, 80% positive feedback on visuals.
+- **Tools**: Hotjar for heatmaps; Google Analytics for app events.
+- **Output**: `pairme/docs/beta-visuals-feedback.md` with iteration notes.
+
+---
+
+### 7. 👉 Next Steps
+
+1. **Confirm Style Guide**: Reply with any tweaks to colors, fonts, or tone (e.g., “Swap Crimson Red for softer pink?”).
+2. **Prioritize Assets**: Which visuals do you want first? (e.g., App Icon, Hero Screen, Investor Infographic).
+3. **Image Generation**: Should I generate sample images now (e.g., App Icon or Hero Screen)? I’ll need confirmation to proceed with generation, as per my guidelines.
+4. **Figma Setup**: Want me to create a Figma project link with the style guide and initial mockups? (I can simulate a shareable prototype.)
+5. **Marketing Kickoff**: Ready to draft a social media post or reel script to tease the visuals?
 
 ---
 
@@ -954,224 +1233,7 @@ CREATE TABLE feedback (
   updown BOOLEAN NOT NULL,
   created_at TIMESTAMP DEFAULT now()
 );
+``` 
 
-#Visula Bibble
-Your vision for PairMe’s visual identity is bold, premium, and user-centric—perfect for creating a cohesive, love-at-first-sight experience that screams luxury and tech-forward vibes. Below, I’ll refine and expand on your plan to ensure the visuals are consistent, scalable, and tailored for all stakeholders (users, investors, merchants). I’ll also address how to make users fall in love with the app through intuitive, engaging design while maintaining a professional, investor-grade aesthetic. Since you’ve asked about visuals and want people to love and use the app, I’ll focus on creating a **Visual Master Pack** that’s ready for development, marketing, and pitching, with clear next steps for implementation.
-
----
-
-## 🎨 PairMe Visual Master Pack (Detailed Plan)
-
-H3y tema my goal is to craft a visual identity that’s instantly recognizable, emotionally engaging, and functional across platforms (iOS, Android, web, marketing collateral). The style will blend **cinematic luxury** with **playful interactivity**, ensuring users feel like they’re curating a premium night out with every tap. Below is the finalized style guide, asset breakdown, and implementation strategy.
-
-### 1. 🎯 Master Style Guide
-
-This is the DNA of PairMe’s look and feel, ensuring consistency across all touchpoints us my advise and creat your own temp. for Qi pulls
-
-#### Colors
-| Name          | Hex       | Usage                                    |
-|---------------|-----------|------------------------------------------|
-| Deep Indigo   | `#1E1A39` | Primary backdrop, headers, dark mode     |
-| Neon Teal     | `#00FFC6` | AI glow, buttons, active states, accents |
-| Amber Gold    | `#FFB300` | Coupons, pricing, loyalty highlights     |
-| Crimson Red   | `#E63946` | Alerts, timers, urgent CTAs              |
-| White         | `#FFFFFF` | Text, overlays, clean backgrounds        |
-| Neutral Gray  | `#4A4A4A` | Secondary text, inactive states          |
-
-- **Palette Logic**: Indigo conveys luxury and trust (think high-end whiskey bars). Neon Teal adds a futuristic, AI-driven edge. Amber Gold screams value and exclusivity for merchants/users. Crimson Red creates urgency for timed deals.
-- **Accessibility**: High contrast ratios (e.g., White on Indigo = 15:1) ensure WCAG 2.1 AA compliance for readability.
-
-#### Typography
-| Font          | Style            | Usage                                    |
-|---------------|------------------|------------------------------------------|
-| Inter         | Bold (700)       | Headings, screen titles, CTAs            |
-| SF Pro (iOS) / Roboto (Android) | Regular (400) | Body text, descriptions, labels         |
-| Inter         | Italic (400)     | “Why it Works” explanations, captions    |
-
-- **Sizes**:
-  - Headings: 24–32px (H1), 18–22px (H2).
-  - Body: 14–16px.
-  - Captions: 12px (italicized for flavor notes).
-- **Logic**: Inter Bold is modern and tech-forward, aligning with PairMe’s AI-driven identity. SF Pro/Roboto ensures native platform familiarity. Italics add a personal, curated touch for explainability.
-- **Fallbacks**: System fonts (San Francisco, Roboto) for performance; Google Fonts for web.
-
-#### Style Tone
-- **Cinematic**: Gradient overlays (Indigo to Teal), soft glowing edges, and subtle motion (e.g., pulsing CTAs).
-- **Premium**: High-resolution lifestyle imagery (e.g., whiskey pours, cannabis jars, charcuterie boards) sourced from Unsplash-style libraries or custom shoots.
-- **Interactive**: Micro-animations (e.g., scanner pulse, tile flips for recommendations) to make the app feel alive.
-- **Consistency**: Border-radius (8px) for buttons/cards, 16px margins, 4px shadows for depth.
-
-#### Iconography
-- **Custom Icons**: Minimalist, line-based icons for Food (fork), Drink (glass), Smoke (leaf), Vibe (music note).
-- **Dynamic States**: Glow effect (Neon Teal) for active icons; Gray for inactive.
-- **Scalability**: SVG format for crisp rendering at all sizes (32px for app, 128px for marketing).
-
-#### Motion Guidelines
-- **Transitions**: 300ms ease-in-out for screen changes; 200ms for button hovers.
-- **Animations**: Subtle pulses for scanner, fade-ins for recommendation tiles, slide-up for modals.
-- **Performance**: Optimize for 60fps on mid-tier devices (e.g., iPhone 12, Galaxy A54).
-
----
-
-### 2. 📱 App Experience Images
-
-These visuals are designed to make users download and engage with PairMe instantly. Each asset is optimized for App Store/Google Play previews, social media, and in-app delight.
-
-#### App Icon (1024x1024)
-- **Design**: A bold “P” (Inter Bold) centered on a Deep Indigo gradient (top-left) to Neon Teal (bottom-right). Four micro-icons (Food, Drink, Smoke, Vibe) subtly embedded in corners, glowing in Amber Gold.
-- **Effect**: 3D embossed look with a soft Teal glow.
-- **Usage**: App Store, Google Play, home screen.
-- **Why Users Love It**: Premium, futuristic, instantly recognizable.
-
-#### Hero Screen Mockup
-- **Design**: iPhone 16 frame showing the Scan Screen: a whiskey bottle in the camera viewfinder, Neon Teal scanner frame pulsing, and a “Scan Now” CTA in Amber Gold. Background fades to Indigo with a tagline overlay: “Scan Once. Curate Your Night.”
-- **Details**: Show a partial Session Screen preview (tiles for Food, Drink, Smoke, Vibe) sliding in from the right.
-- **Usage**: App Store feature graphic, website hero, pitch decks.
-- **Why Users Love It**: Shows the core value (scan → curated night) in one glance.
-
-#### Mood Pairing Screen
-- **Design**: A cinematic 2x2 grid (Food, Drink, Smoke, Vibe) with high-res lifestyle images (e.g., charcuterie, whiskey pour, cannabis jar, neon playlist). Each tile has a score (e.g., “0.92”) in Neon Teal and a “Why” button (Inter Italic). Mood selector (Chill, Creative, Social, Sleep) at the top in Amber Gold.
-- **Details**: Subtle animations (tiles flip to reveal “Why it Works” text). Deep Indigo background with gradient overlays.
-- **Usage**: App Store screenshots, social media reels.
-- **Why Users Love It**: Visually rich, interactive, and personalized.
-
-#### Coupon Book UI
-- **Design**: A scrollable list of coupons ($50+ items) with Amber Gold price tags and Crimson Red countdown timers (e.g., “3h left”). Each coupon card has a merchant logo, deal details, and a “Redeem” CTA in Neon Teal.
-- **Details**: Glowing edges on active coupons; “PairPoints Earned” badge in White.
-- **Usage**: App Store preview, merchant pitches.
-- **Why Users Love It**: Gamified savings feel rewarding and urgent.
-
-#### Find Near Me Modal
-- **Design**: A modal with a list of merchants (name, price, distance, stock status) and a mini-map with pins (Neon Teal for in-stock, Gray for out-of-stock). Filter buttons (Radius, Price, Stock) in Amber Gold.
-- **Details**: Clean White background with Indigo headers. “Open in Maps” CTA in Neon Teal.
-- **Usage**: App Store screenshots, user onboarding.
-- **Why Users Love It**: Practical, location-based, and visually clear.
-
----
-
-### 3. 📊 Investor / Deck Graphics
-
-These assets are designed to sell PairMe’s vision to investors, focusing on clarity, data-driven storytelling, and market differentiation.
-
-#### Business Model Infographic
-- **Design**: A playful split-screen: Left side shows “Customer ($4.20/mo)” with icons for AI Coupon Book, PairPoints, and mood pairings; right side shows “Business ($32/mo)” with icons for coupons, loyalty tools, and analytics. Neon Teal arrows connect both to PairMe’s logo in the center.
-- **Details**: Amber Gold highlights for revenue streams (subscriptions, affiliate CPA). Deep Indigo background for contrast.
-- **Usage**: Pitch deck slide, investor one-pager.
-- **Why Investors Love It**: Clear revenue model with fun $4.20 nod.
-
-#### Engagement Flywheel
-- **Design**: A circular diagram showing “User Scans → PairMe Recommends → Merchant Sales → User Rewards → More Scans.” Each step has a lifestyle image (e.g., whiskey pour, dispensary shelf) and metrics (e.g., “70% D1 retention”). Neon Teal arrows, Amber Gold metrics.
-- **Details**: Deep Indigo canvas with White text for readability.
-- **Usage**: Pitch deck, website explainer.
-- **Why Investors Love It**: Visualizes virality and ecosystem value.
-
-#### Market Opportunity Graph
-- **Design**: A 2D plot with PairMe at the center (Neon Teal dot) vs. competitors (Wine-Searcher, Untappd, Weedmaps) on axes: X (Cross-Category Pairing), Y (Live Inventory). PairMe dominates top-right quadrant. Market size ($1.5B, 12% CAGR) in Amber Gold text.
-- **Details**: Simple White background with Indigo gridlines.
-- **Usage**: Pitch deck, investor one-pager.
-- **Why Investors Love It**: Shows PairMe’s unique positioning.
-
----
-
-### 4. 🏪 Merchant-Facing Assets
-
-These visuals build trust and drive adoption among merchants (bars, dispensaries, retailers).
-
-#### Merchant Dashboard Mockup
-- **Design**: A laptop screen showing a dashboard with tabs: “Coupons,” “Analytics,” “Loyalty.” Coupon tab shows a form to upload deals (e.g., “$50+ whiskey, 10% off”). Analytics tab shows charts (views, redemptions) in Neon Teal. Loyalty tab shows PairPoints multipliers in Amber Gold.
-- **Details**: Indigo sidebar, White content area, Crimson Red for unpublished coupons.
-- **Usage**: Merchant pitch deck, onboarding guide.
-- **Why Merchants Love It**: Clean, actionable, and revenue-focused.
-
-#### Verified Merchant Shield
-- **Design**: A badge with a Neon Teal checkmark inside an Amber Gold shield, labeled “PairMe Verified.” Subtle Indigo gradient background.
-- **Details**: SVG format for scalability; 128x128px default.
-- **Usage**: Merchant websites, in-app “Find Near Me” listings.
-- **Why Merchants Love It**: Builds trust and prestige.
-
----
-
-### 5. 🌍 Lifestyle & Marketing Assets
-
-These assets drive viral adoption through social media, ads, and launch campaigns.
-
-#### Lifestyle Collage
-- **Design**: A 4-quadrant collage: Food (charcuterie board), Drink (whiskey pour with ice), Smoke (cannabis jar with swirling smoke), Vibe (vinyl record spinning under neon lights). Each quadrant has a Neon Teal frame and a subtle PairMe logo watermark.
-- **Details**: High-res (1920x1080), cinematic lighting, Indigo-to-Teal gradient overlay.
-- **Usage**: Instagram/TikTok posts, website backgrounds.
-- **Why Users Love It**: Aspirational, immersive, and shareable.
-
-#### Social Promo Image
-- **Design**: A phone mockup showing the Session Screen (Food, Drink, Smoke, Vibe tiles) with a glowing Neon Teal border. Tagline: “Scan Once. Curate Your Night.” in Inter Bold (White). Amber Gold CTA button: “Download Now.”
-- **Details**: 1080x1080 for Instagram; 1920x1080 for X banners.
-- **Usage**: Social media ads, App Store carousel.
-- **Why Users Love It**: Clear value prop with vibrant visuals.
-
-#### Launch Teaser Poster
-- **Design**: A minimalist Deep Indigo background with the PairMe logo glowing in Neon Teal. Tagline: “Unlock Your Night.” in Inter Bold (White). Subtle lifestyle images (whiskey glass, cannabis leaf) fading into corners.
-- **Details**: 24x36in for physical posters; 1080x1920 for digital.
-- **Usage**: Bar/dispensary posters, launch event banners.
-- **Why Users Love It**: Mysterious and premium, builds anticipation.
-
----
-
-### 6. ✅ Implementation Plan
-
-#### Step 1: Finalize Style Guide 
-- **Action**: Approve colors, typography, and tone above.
-- **Output**: `pairme/docs/style-guide.md` with Hex codes, font files, and icon SVGs.
-- **Tool**: Figma for style guide creation; export as PDF for team.
-
-#### Step 2: Generate Mockups (
-- **Action**: Create high-fidelity mockups for App Icon, Hero Screen, Mood Pairing Screen, Coupon Book, Find Near Me, and Investor/Merchant assets.
-- **Tools**:
-  - Figma for static designs (App Store, pitch deck).
-  - Adobe After Effects for animations (scanner pulse, tile flips).
-  - Unsplash or custom photography for lifestyle images.
-- **Output**: `pairme/assets/mockups/` with PNGs (1920x1080) and SVGs for icons.
-
-#### Step 3: Integrate into App 
-- **Action**: Update `pairme-app/src/` with new assets and CSS:
-  - `src/config.js`: Add color constants (`COLORS.DEEP_INDIGO = '#1E1A39'`).
-  - `assets/`: Store icons, images, and animations.
-  - `src/screens/`: Apply styles to ScanScreen, SessionScreen, etc.
-- **Tools**: React Native (Expo) for mobile; Tailwind CSS for web (`reset-web`).
-- **Output**: Updated app with consistent visuals; test on iOS 18, Android 15.
-
-#### Step 4: Marketing Rollout 
-- **Action**: Deploy Lifestyle Collage, Social Promo, and Teaser Poster to:
-  - TikTok/Instagram: 15s reels showing scan → pairing flow.
-  - X: Posts with #PairMeNight hashtag.
-  - App Store/Google Play: Update screenshots and feature graphic.
-- **Tools**: Canva for quick social edits; Hootsuite for scheduling.
-- **Output**: `pairme/docs/marketing-plan.md` with campaign schedule.
-
-#### Step 5: User Testing & Iteration (Ongoing)
-- **Action**: Beta test visuals with 100 users; measure engagement (clicks on CTAs, time on Session Screen).
-- **Metrics**: 95% task completion rate, 80% positive feedback on visuals.
-- **Tools**: Hotjar for heatmaps; Google Analytics for app events.
-- **Output**: `pairme/docs/beta-visuals-feedback.md` with iteration notes.
-
----
-
-### 7. 👉 Next Steps for my team 
-
-1. **Confirm Style Guide**: Reply with any tweaks to colors, fonts, or tone (e.g., “Swap Crimson Red for softer pink?”).
-2. **Prioritize Assets**: Which visuals do you want first? (e.g., App Icon, Hero Screen, Investor Infographic).
-3. **Image Generation**: Should I generate sample images now (e.g., App Icon or Hero Screen)? I’ll need confirmation to proceed with generation, as per my guidelines.
-4. **Figma Setup**: Want me to create a Figma project link with the style guide and initial mockups? (I can simulate a shareable prototype.)
-5. **Marketing Kickoff**: Ready to draft a social media post or reel script to tease the visuals?
-
-
-```
----
-imaging
-<img width="1024" height="1024" alt="1000020589" src="https://github.com/user-attachments/assets/46cf5cdb-68e4-48d6-90b4-4191c5290c17" />
-
-<img width="1024" height="1024" alt="1000020590" src="https://github.com/user-attachments/assets/7a2f47c4-141c-4e4a-bfb8-ac10487821cc" />
-
-<img width="1024" height="1024" alt="1000020584" src="https://github.com/user-attachments/assets/6a35e28e-0468-4dde-bd3c-1944a81cfcf1" />
-
-![1000023795](https://github.com/user-attachments/assets/c2c6686f-73c8-4ccb-afea-959bf4af5fb9)
 ---
 
