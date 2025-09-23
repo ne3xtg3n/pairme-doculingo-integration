@@ -3,7 +3,7 @@ https://github.com/ne3xtg3n/pairme-doculingo-integration/tree/main
 ---
 ## ▶ Live Prototype
 
-[![Open on Lovable.dev](https://img.shields.io/badge/Open%20Prototype-Lovable.dev-0bbf7a.svg)](https://lovable.dev/projects/e042fff4-6301-40a1-921a-b22f393b31d3)
+[![Open on Lovable.dev](https://lovable.dev/projects/e042fff4-6301-40a1-921a-b22f393b31d3)
 
 If the link requires access, request it or sign in to Lovable first.
 📦 Repository: pairme-doculingo-partner-pack/
