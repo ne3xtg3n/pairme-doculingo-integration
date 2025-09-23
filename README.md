@@ -1,4 +1,6 @@
 # PairMe™ — Comprehensive Engineering Documentation (v1.0)
+![1000023844](https://github.com/user-attachments/assets/f105ba6b-9c78-4429-807c-f1b963dad9e3)
+
 
 **Author:** Christopher Perry  
 **Contributors:** Open for Engineering Community Input  
