@@ -4,7 +4,7 @@
 **Contributors:** Open for Engineering Community Input  
 **Status:** v1.0 (Production-Ready MVP Spec)  
 **Date:** September 23, 2025  
-**License:** MIT License – Open for collaboration, commercial use with attribution  
+**License:** License – Open for collaboration with **Dculingo**  
 
 This README provides a complete, self-contained engineering specification for building **PairMe**, an AI-driven mobile and web app that delivers personalized, cross-category pairing recommendations for **Food, Drink, Smoke, and Vibe** through a single scan (QR, barcode, or image). Integrated with **Doculingo** for multilingual label parsing and compliance, PairMe uses a deterministic scoring engine, user feedback loops, and live merchant data to create a seamless, explainable, and scalable pairing experience. The design is inspired by leading AI apps and real-world integrations (e.g., Wine-Searcher, Weedmaps)<grok:render type="render_inline_citation"><argument name="citation_id">0</argument></grok:render>.
 
@@ -953,6 +953,14 @@ CREATE TABLE feedback (
   created_at TIMESTAMP DEFAULT now()
 );
 ```
+---
+imaging
+<img width="1024" height="1024" alt="1000020589" src="https://github.com/user-attachments/assets/46cf5cdb-68e4-48d6-90b4-4191c5290c17" />
 
+<img width="1024" height="1024" alt="1000020590" src="https://github.com/user-attachments/assets/7a2f47c4-141c-4e4a-bfb8-ac10487821cc" />
+
+<img width="1024" height="1024" alt="1000020584" src="https://github.com/user-attachments/assets/6a35e28e-0468-4dde-bd3c-1944a81cfcf1" />
+
+![1000023795](https://github.com/user-attachments/assets/c2c6686f-73c8-4ccb-afea-959bf4af5fb9)
 ---
 
