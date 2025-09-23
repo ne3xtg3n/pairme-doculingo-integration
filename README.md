@@ -11,7 +11,6 @@
 
 **PairMe™** is an AI-driven mobile and web app that curates personalized **Food, Drink, Spark, Vibe, and Events** recommendations from a single scan (QR, barcode, or image). Powered by the proprietary **LabelSync Engine** for label parsing, translation, compliance, and drink inventory management, PairMe delivers a seamless, budget-optimized experience with auto-applied coupons and an Events ticketing hub. Inspired by Spotify’s discovery and Mint.com’s budgeting, it’s the ultimate lifestyle curator with a cinematic UI, targeting 10M+ users at <400ms P95 latency.
 
-This README consolidates the GitHub repository into a ShiftMate-style, investor-grade, USPTO-ready format, incorporating new features (Events, Budget, Coupons) and your images (`1000023844`, `1000020589`, `1000020590`, `1000023795`). It ensures no external licensing dependencies (e.g., Wine-Searcher removed) and enables engineers to build, test, and deploy PairMe while supporting patent filing.
 
 **Use this for**: Infrastructure setup, development, API integrations, compliance, investor pitches, and USPTO filing.  
 
